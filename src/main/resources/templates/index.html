@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Library Management System</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h1>Library Management System</h1>
+
+<h2>Books</h2>
+<ul id="bookList">
+    <!-- Books will be dynamically added here -->
+</ul>
+
+<h2>Readers</h2>
+<ul id="readerList">
+    <!-- Readers will be dynamically added here -->
+</ul>
+
+<h2>Add Book</h2>
+<form id="addBookForm">
+    <label>Title:</label><br>
+    <input type="text" id="title" name="title"><br>
+    <label>Author:</label><br>
+    <input type="text" id="author" name="author"><br>
+    <label>ISBN:</label><br>
+    <input type="text" id="isbn" name="isbn"><br>
+    <button type="submit">Add Book</button>
+</form>
+
+<h2>Add Reader</h2>
+<form id="addReaderForm">
+    <label>Name:</label><br>
+    <input type="text" id="name" name="name"><br>
+    <label>Surname:</label><br>
+    <input type="text" id="surname" name="surname"><br>
+    <label>Reader Ticket:</label><br>
+    <input type="text" id="readerTicket" name="readerTicket"><br>
+    <button type="submit">Add Reader</button>
+</form>
+
+<script>
+    // Function to fetch and display books from backend
+    function fetchBooks() {
+        $.get("/library/items", function (data) {
+            $('#bookList').empty();
+            data.forEach(function (book) {
+                $('#bookList').append('<li>' + book.title + ' by ' + book.author + '</li>');
+            });
+        });
+    }
+
+    // Function to fetch and display readers from backend
+    function fetchReaders() {
+        $.get("/library/readers", function (data) {
+            $('#readerList').empty();
+            data.forEach(function (reader) {
+                $('#readerList').append('<li>' + reader.name + ' ' + reader.surname + ' (' + reader.readerTicket + ')' + '</li>');
+            });
+        });
+    }
+
+    // Add Book form submit handler
+    $('#addBookForm').submit(function (event) {
+        event.preventDefault();
+        var formData = {
+            title: $('#title').val(),
+            author: $('#author').val(),
+            isbn: $('#isbn').val()
+        };
+        $.post("/library/items", formData, function () {
+            fetchBooks();
+            $('#addBookForm')[0].reset();
+        });
+    });
+
+    // Add Reader form submit handler
+    $('#addReaderForm').submit(function (event) {
+        event.preventDefault();
+        var formData = {
+            name: $('#name').val(),
+            surname: $('#surname').val(),
+            readerTicket: $('#readerTicket').val()
+        };
+        $.post("/library/readers", formData, function () {
+            fetchReaders();
+            $('#addReaderForm')[0].reset();
+        });
+    });
+
+    // Fetch books and readers on page load
+    $(document).ready(function () {
+        fetchBooks();
+        fetchReaders();
+    });
+</script>
+</body>
+</html>
